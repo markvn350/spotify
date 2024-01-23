@@ -6,7 +6,7 @@ import { sessionGuardFunctional } from '@core/guards/sessionGuardF';
 import { HomePageComponent } from '@modules/home/pages/home-page/home-page.component';
 
 
-const routes: Routes = [
+export const routes: Routes = [
  {
   path: '',
   component: HomePageComponent,
@@ -21,6 +21,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule { }

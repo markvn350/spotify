@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, inject, DestroyRef } from '@angular/core';
 import { TrackModel } from '@core/models/tracks.model';
 import { MultimediaServiceService } from '@shared/services/multimedia-service.service';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { NgTemplateOutlet, NgIf, NgClass, AsyncPipe } from '@angular/common';
-
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-media-player',
@@ -16,7 +16,9 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   mockCover!: TrackModel ;
   @ViewChild ("progressBar") progressBar : ElementRef = new ElementRef("");
 
-  constructor(public _multimediaService: MultimediaServiceService) { }
+  public _multimediaService = inject(MultimediaServiceService);
+  public destroyRef = inject(DestroyRef);
+
   observers$: Array<Subscription> = [];
   observer1$: Subscription = new Subscription(); 
     
@@ -34,12 +36,16 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     
-    this.observer1$ = this._multimediaService.trackInfo$.subscribe(track => {
+    this.observer1$ = this._multimediaService.trackInfo$
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe(track => {
       console.log("Contenido de la cancion" , track);
       this.mockCover = track;
     });
 
-    const observer2$ = this._multimediaService.playerStatus$.subscribe(status => {
+    const observer2$ = this._multimediaService.playerStatus$
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe(status => {
       this.state = status;
       
     });
